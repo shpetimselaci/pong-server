@@ -8,6 +8,7 @@ import (
 	"golang.org/x/image/font"
 	"image/color"
 	"log"
+	"math"
 )
 
 const (
@@ -21,7 +22,7 @@ var (
 )
 
 func InitFonts() {
-	tt, err := truetype.Parse(fonts.ArcadeN_ttf)
+	tt, err := truetype.Parse(fonts.MPlus1pRegular_ttf)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -42,13 +43,12 @@ func DrawCaption(state GameState, color color.Color, screen *ebiten.Image) {
 	w, h := screen.Size()
 	msg := []string{}
 	switch state {
-	case PlayState, InterState, PauseState:
-		msg = append(msg, "Press SPACE key to take a break (not too long though)")
-	case ControlsState:
-		msg = append(msg, "Press SPACE to go back to main menu")
+	case StartState, PlayState:
+		msg = append(msg, "Player 1: ↑ is UP, ↓ is Down\nPlayer 2: W is UP, S is Down")
 	}
 	for i, l := range msg {
-		x := (w - len(l)*smallFontSize) / 2
+		n := len(l)*smallFontSize
+		x := int(math.Abs(float64(w - n)) / 2)
 		text.Draw(screen, l, SmallArcadeFont, x, h-4+(i-2)*smallFontSize, color)
 	}
 }
@@ -62,35 +62,7 @@ func DrawBigText(state GameState, color color.Color, screen *ebiten.Image) {
 			"",
 			"PONG",
 			"",
-			"C -> CONTROLS",
-			"V -> VS GAME",
-			"A -> AI GAME",
-		}
-	case ControlsState:
-		texts = []string{
-			"",
-			"PLAYER 1:",
-			"W -> UP",
-			"S -> DOWN",
-			"",
-			"PLAYER 2:",
-			"O -> UP",
-			"K -> DOWN",
-		}
-	case InterState:
-		texts = []string{
-			"",
-			"",
-			"SPACE -> RESUME",
-			"R     -> RESET",
-		}
-	case PauseState:
-		texts = []string{
-			"",
-			"PAUSED",
-			"",
-			"SPACE -> RESUME",
-			"R     -> RESET",
+			"SPACE -> START GAME",
 		}
 	case GameOverState:
 		texts = []string{

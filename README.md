@@ -1,37 +1,23 @@
 # Pong in Go
 
-This is a pet project to try out WebAssembly with Go (golang) in a fun way. The game should be available [on my blog](https://dstoiko.github.io/posts/go-pong-wasm/). You can also build it and try locally on desktop.
+This project is a simpler version of https://github.com/dstoiko/go-pong-wasm,
+used as a demonstration of a native app running pong in golang. If working 
+on [the pong exercise](https://docs.google.com/document/d/1Q8iGyyG-pv1GJTFA7hctVbwlHdvh0YM2JzmrVLl4dOE/edit),
+you can use the logic in this project as an inspiration.
 
-![Demo](demo-v1.gif)
+However, there are crucial differences between this project and the pong exercise:
 
-_The AI always wins..._
+ - The pong exercise is a online multiplayer pong written using Golang and React. This project is a native app letting two players play locally.
+ - The pong exercise expect the client side displaying the game to be written in React, and the server side only maintaining state. This project actually draws the game state using Golang and the Ebiten framework.
 
 ## Features
 
 - [x] Works on desktop (Linux, MacOS, Windows)
-- [x] Works in web browsers using WebAssembly
 - [x] 2-player "VS" mode with same keyboard
-- [x] Survival-style "AI" mode with unbeatable AI (unless you find a glitch)
-- [x] Difficulty/speed increases as you play
 
-## Build locally
+## Build instructions
 
 First, `git clone` and `cd` into this repo.
 
-### Native desktop version
-
 1. Run `make native` to build for native desktop (Linux, MacOS, Windows)
 2. Run the game binary: `./build/pong`
-
-### WebAssembly version (browser)
-
-1. Run `make wasm` to build for WASM target
-2. Run the simple web server locally: `go run server/server.go`
-3. Run the game inside a browser at https://localhost:8080
-
-## TODO / Ideas
-
-- [ ] Make it work on mobile (gomobile compilation targets + touch/drag handling of paddles)
-- [ ] Add sounds from original Pong game
-- [ ] Add crazy mode with multiple balls
-- [ ] Add leaderboard

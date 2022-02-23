@@ -1,4 +1,4 @@
-module github.com/dstoiko/go-pong-wasm
+module github.com/jtestard/go-pong
 
 go 1.12
 

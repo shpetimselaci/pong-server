@@ -2,17 +2,15 @@ package main
 
 import (
 	"fmt"
-	"github.com/dstoiko/go-pong-wasm/pong"
 	"github.com/hajimehoshi/ebiten"
 	"github.com/hajimehoshi/ebiten/ebitenutil"
 	"github.com/hajimehoshi/ebiten/inpututil"
-	"runtime"
+	"github.com/jtestard/go-pong/pong"
 )
 
 // Game is the structure of the game state
 type Game struct {
 	state    pong.GameState
-	aiMode   bool
 	ball     *pong.Ball
 	player1  *pong.Paddle
 	player2  *pong.Paddle
@@ -34,20 +32,15 @@ const (
 )
 
 // NewGame creates an initializes a new game
-func NewGame(aiMode bool) *Game {
+func NewGame() *Game {
 	g := &Game{}
-	g.init(aiMode)
+	g.init()
 	return g
 }
 
-func (g *Game) init(aiMode bool) {
+func (g *Game) init() {
 	g.state = pong.StartState
-	g.aiMode = aiMode
-	if aiMode {
-		g.maxScore = 100
-	} else {
-		g.maxScore = 11
-	}
+	g.maxScore = 11
 
 	g.player1 = &pong.Paddle{
 		Position: pong.Position{
@@ -58,8 +51,8 @@ func (g *Game) init(aiMode bool) {
 		Width:  pong.InitPaddleWidth,
 		Height: pong.InitPaddleHeight,
 		Color:  pong.ObjColor,
-		Up:     ebiten.KeyW,
-		Down:   ebiten.KeyS,
+		Up:     ebiten.KeyUp,
+		Down:   ebiten.KeyDown,
 	}
 	g.player2 = &pong.Paddle{
 		Position: pong.Position{
@@ -70,8 +63,8 @@ func (g *Game) init(aiMode bool) {
 		Width:  pong.InitPaddleWidth,
 		Height: pong.InitPaddleHeight,
 		Color:  pong.ObjColor,
-		Up:     ebiten.KeyO,
-		Down:   ebiten.KeyK,
+		Up:     ebiten.KeyW,
+		Down:   ebiten.KeyS,
 	}
 	g.ball = &pong.Ball{
 		Position: pong.Position{
@@ -112,41 +105,22 @@ func (g *Game) reset(screen *ebiten.Image, state pong.GameState) {
 func (g *Game) Update(screen *ebiten.Image) error {
 	switch g.state {
 	case pong.StartState:
-		if inpututil.IsKeyJustPressed(ebiten.KeyC) {
-			g.state = pong.ControlsState
-		} else if inpututil.IsKeyJustPressed(ebiten.KeyA) {
-			g.aiMode = true
-			g.state = pong.PlayState
-		} else if inpututil.IsKeyJustPressed(ebiten.KeyV) {
-			g.aiMode = false
+		if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
 			g.state = pong.PlayState
 		}
 
-	case pong.ControlsState:
-		if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
-			g.state = pong.StartState
-		}
 	case pong.PlayState:
 		w, _ := screen.Size()
 
-		if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
-			g.state = pong.PauseState
-			break
-		}
-
 		g.player1.Update(screen)
-		if g.aiMode {
-			g.player2.AiUpdate(g.ball)
-		} else {
-			g.player2.Update(screen)
-		}
+		g.player2.Update(screen)
 
 		xV := g.ball.XVelocity
 		g.ball.Update(g.player1, g.player2, screen)
 		// rally count
 		if xV*g.ball.XVelocity < 0 {
 			// score up when ball touches human player's paddle
-			if g.aiMode && g.ball.X < float32(w/2) {
+			if g.ball.X < float32(w/2) {
 				g.player1.Score++
 			}
 
@@ -164,29 +138,14 @@ func (g *Game) Update(screen *ebiten.Image) error {
 
 		if g.ball.X < 0 {
 			g.player2.Score++
-			if g.aiMode {
-				g.state = pong.GameOverState
-				break
-			}
-			g.reset(screen, pong.InterState)
+			g.reset(screen, pong.StartState)
 		} else if g.ball.X > float32(w) {
 			g.player1.Score++
-			if g.aiMode {
-				g.state = pong.GameOverState
-				break
-			}
-			g.reset(screen, pong.InterState)
+			g.reset(screen, pong.StartState)
 		}
 
 		if g.player1.Score == g.maxScore || g.player2.Score == g.maxScore {
 			g.state = pong.GameOverState
-		}
-
-	case pong.InterState, pong.PauseState:
-		if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
-			g.state = pong.PlayState
-		} else if inpututil.IsKeyJustPressed(ebiten.KeyR) {
-			g.reset(screen, pong.StartState)
 		}
 
 	case pong.GameOverState:
@@ -206,12 +165,9 @@ func (g *Game) Draw(screen *ebiten.Image) error {
 
 	pong.DrawCaption(g.state, pong.ObjColor, screen)
 	pong.DrawBigText(g.state, pong.ObjColor, screen)
-
-	if g.state != pong.ControlsState {
-		g.player1.Draw(screen, pong.ArcadeFont, false)
-		g.player2.Draw(screen, pong.ArcadeFont, g.aiMode)
-		g.ball.Draw(screen)
-	}
+	g.player1.Draw(screen, pong.ArcadeFont)
+	g.player2.Draw(screen, pong.ArcadeFont)
+	g.ball.Draw(screen)
 
 	ebitenutil.DebugPrint(screen, fmt.Sprintf("TPS: %0.2f", ebiten.CurrentTPS()))
 
@@ -224,13 +180,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 }
 
 func main() {
-	// On browsers, let's use fullscreen so that this is playable on any browsers.
-	// It is planned to ignore the given 'scale' apply fullscreen automatically on browsers (#571).
-	if runtime.GOARCH == "js" || runtime.GOOS == "js" {
-		ebiten.SetFullscreen(true)
-	}
-	ai := true
-	g := NewGame(ai)
+	g := NewGame()
 	if err := ebiten.RunGame(g); err != nil {
 		panic(err)
 	}

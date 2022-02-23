@@ -24,10 +24,7 @@ type GameState byte
 
 const (
 	StartState GameState = iota
-	ControlsState
 	PlayState
-	InterState
-	PauseState
 	GameOverState
 )
 
