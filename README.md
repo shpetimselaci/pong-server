@@ -19,5 +19,5 @@ However, there are crucial differences between this project and the pong exercis
 
 First, `git clone` and `cd` into this repo.
 
-1. Run `make native` to build for native desktop (Linux, MacOS, Windows)
-2. Run the game binary: `./build/pong`
+1. Run `make build` to build for native desktop (Linux, MacOS, Windows)
+2. Run `make run` to start running the game.
