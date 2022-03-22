@@ -2,7 +2,6 @@ package pong
 
 import (
 	"github.com/hajimehoshi/ebiten"
-	"image/color"
 )
 
 // Ball is a pong ball
@@ -11,21 +10,14 @@ type Ball struct {
 	Radius    float32
 	XVelocity float32
 	YVelocity float32
-	Color     color.Color
-	Img       *ebiten.Image
 }
 
 const (
 	InitBallRadius = 10.0
 )
 
-func setBallPixels(c color.Color, ballImg *ebiten.Image) {
-	// TODO: set pixels for round effect
-	ballImg.Fill(c)
-}
-
-func (b *Ball) Update(leftPaddle *Paddle, rightPaddle *Paddle, screen *ebiten.Image) {
-	_, h := screen.Size()
+func (b *Ball) Update(leftPaddle *Paddle, rightPaddle *Paddle) {
+	h := windowHeight
 	b.X += b.XVelocity
 	b.Y += b.YVelocity
 
@@ -55,6 +47,15 @@ func (b *Ball) Update(leftPaddle *Paddle, rightPaddle *Paddle, screen *ebiten.Im
 func (b *Ball) Draw(screen *ebiten.Image) {
 	opts := &ebiten.DrawImageOptions{}
 	opts.GeoM.Translate(float64(b.X), float64(b.Y))
-	setBallPixels(b.Color, b.Img)
-	screen.DrawImage(b.Img, opts)
+	// setBallPixels(b.Color, b.Img)
+	// screen.DrawImage(b.Img, opts)
+}
+
+func (b *Ball) GetBallState() Ball {
+	return Ball{
+		Position:  b.Position,
+		Radius:    b.Radius,
+		XVelocity: b.XVelocity,
+		YVelocity: b.YVelocity,
+	}
 }

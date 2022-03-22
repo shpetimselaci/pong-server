@@ -21,3 +21,17 @@ First, `git clone` and `cd` into this repo.
 
 1. Run `make build` to build for native desktop (Linux, MacOS, Windows)
 2. Run `make run` to start running the game.
+
+## Caution
+
+This project was written having no prior experience with GO language, thus I would recommend not taking this an example to write something off from.
+
+
+## ToDo List
+
+* ~~Learn how to write and understand Golang to some extent~~
+* ~~Remove unnecessary drawing~~
+* ~~Add web sockets~~
+* ~~Make sure state is updated when user sends action~~
+* ~~Send socket updates~~
+* Avoid having more than 2 web socket connections to prevent more than 2 players
