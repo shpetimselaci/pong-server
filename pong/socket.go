@@ -62,10 +62,6 @@ func ListenAndServe(g *Game) {
 				fmt.Println(userAction.Action, userAction.Key)
 
 				g.UpdateGameState(*userAction)
-				err = sendGameState(g)
-				if err != nil {
-					fmt.Println("Something terrible happened", err)
-				}
 			}
 		}()
 	})
