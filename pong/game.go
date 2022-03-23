@@ -59,8 +59,8 @@ func (g *Game) init(player1Name string, player2Name string) {
 		Speed:      initPaddleSpeed,
 		Width:      InitPaddleWidth,
 		Height:     InitPaddleHeight,
-		Up:         ebiten.KeyUp,
-		Down:       ebiten.KeyDown,
+		Up:         ebiten.KeyW,
+		Down:       ebiten.KeyS,
 		PlayerName: player1Name,
 	}
 
@@ -72,8 +72,8 @@ func (g *Game) init(player1Name string, player2Name string) {
 		Speed:      initPaddleSpeed,
 		Width:      InitPaddleWidth,
 		Height:     InitPaddleHeight,
-		Up:         ebiten.KeyW,
-		Down:       ebiten.KeyS,
+		Up:         ebiten.KeyUp,
+		Down:       ebiten.KeyDown,
 		PlayerName: player2Name,
 	}
 	g.Ball = &Ball{

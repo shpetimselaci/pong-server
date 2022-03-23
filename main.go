@@ -10,7 +10,6 @@ import (
 
 func main() {
 	runtime.GOMAXPROCS(2) // Set the maximum number of threads/processes
-
 	g := pong.NewGame()
 	fmt.Println("screen size")
 	go pong.ListenAndServe(g)

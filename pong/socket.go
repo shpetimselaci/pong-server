@@ -59,8 +59,6 @@ func ListenAndServe(g *Game) {
 					fmt.Println("err", err, msg)
 				}
 
-				fmt.Println(userAction.Action, userAction.Key)
-
 				g.UpdateGameState(*userAction)
 			}
 		}()
