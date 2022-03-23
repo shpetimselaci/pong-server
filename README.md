@@ -34,4 +34,5 @@ This project was written having no prior experience with GO language, thus I wou
 * ~~Add web sockets~~
 * ~~Make sure state is updated when user sends action~~
 * ~~Send socket updates~~
+* Create CI/CD to deploy at GCP
 * Avoid having more than 2 web socket connections to prevent more than 2 players
