@@ -14,8 +14,10 @@ type Game struct {
 	Rally    int
 	Level    int
 	MaxScore int
-	Ws       *net.Conn
+	Ws       Connections
 }
+
+type Connections = map[net.Conn]*net.Conn
 
 type KeyAction int
 
@@ -27,7 +29,7 @@ type UserAction struct {
 const (
 	initBallVelocity = 5.0
 	initPaddleSpeed  = 10.0
-	speedUpdateCount = 6
+	speedUpdateCount = 2
 	speedIncrement   = 0.5
 )
 
@@ -49,7 +51,8 @@ func NewGame() *Game {
 
 func (g *Game) init(player1Name string, player2Name string) {
 	g.State = StartState
-	g.MaxScore = 11
+	g.MaxScore = 99
+	g.Ws = Connections{}
 
 	g.Player1 = &Paddle{
 		Position: Position{
@@ -129,6 +132,10 @@ func (g *Game) UpdateGameState(action UserAction) error {
 				g.Player1.Score++
 			}
 
+			if g.Ball.X > float32(w/2) {
+				g.Player2.Score++
+			}
+
 			g.Rally++
 
 			// spice things up
@@ -179,9 +186,13 @@ func (g *Game) Draw(screen *ebiten.Image) error {
 	g.Player1.Draw(screen)
 	g.Player2.Draw(screen)
 	g.Ball.Draw(screen)
-	if g.Ws != nil {
-		sendGameState(g)
+
+	err := sendGameState(g)
+
+	if err != nil {
+		panic(err)
 	}
+
 	// ebitenutil.DebugPrint(screen, fmt.Sprintf("TPS: %0.2f", ebiten.CurrentTPS()))
 	// fmt.Println("Rendering", ebiten.CurrentTPS())
 	return nil
