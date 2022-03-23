@@ -7,6 +7,7 @@ import (
 
 	"github.com/gobwas/ws"
 	"github.com/gobwas/ws/wsutil"
+	"github.com/hajimehoshi/ebiten"
 )
 
 type StateResponse struct {
@@ -17,6 +18,7 @@ type StateResponse struct {
 	Rally    int
 	Level    int
 	MaxScore int
+	KeyPads  []ebiten.Key
 }
 
 type CloseResponse struct {
@@ -26,7 +28,7 @@ type CloseResponse struct {
 
 func sendGameState(g *Game) error {
 
-	out, err := json.Marshal(StateResponse{
+	state := StateResponse{
 		Player1:  g.Player1,
 		Player2:  g.Player2,
 		State:    g.State,
@@ -34,12 +36,16 @@ func sendGameState(g *Game) error {
 		MaxScore: g.MaxScore,
 		Level:    g.Level,
 		Rally:    g.Rally,
-	})
-	if err != nil {
-		return err
 	}
-	for _, conn := range g.Ws {
-		msgErr := wsutil.WriteServerText(*conn, out)
+
+	for _, playerConnection := range g.Ws {
+		state.KeyPads = playerConnection.padKeys
+
+		out, err := json.Marshal(state)
+		if err != nil {
+			return err
+		}
+		msgErr := wsutil.WriteServerText(*playerConnection.Connection, out)
 		if msgErr != nil {
 			return err
 		}
@@ -48,13 +54,19 @@ func sendGameState(g *Game) error {
 	return nil
 }
 
+func contains(elems []ebiten.Key, v ebiten.Key) bool {
+	for _, s := range elems {
+		if v == s {
+			return true
+		}
+	}
+	return false
+}
+
 func ListenAndServe(g *Game) {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		r.Header.Set("Access-Control-Allow-Origin", "*")
-		fmt.Println(len(g.Ws))
-
-		fmt.Println("client", r.Host, r.Method, r.URL.Host, r.RemoteAddr)
 		conn, _, _, err := ws.DefaultHTTPUpgrader.Upgrade(r, w)
 		if len(g.Ws) == 2 {
 			out, _ := json.Marshal(CloseResponse{Placeholder: "Two players already connected!", TryAgain: true})
@@ -63,7 +75,15 @@ func ListenAndServe(g *Game) {
 			conn.Close()
 			return
 		}
-		g.Ws[conn] = &conn
+
+		pads := g.freePads[0:2]
+		fmt.Println("prev", g.freePads)
+
+		g.freePads = g.freePads[2:]
+		g.Ws[conn] = PlayerConnection{
+			Connection: &conn,
+			padKeys:    pads,
+		}
 		if err != nil {
 			// handle error
 			fmt.Println(err, "err")
@@ -71,6 +91,11 @@ func ListenAndServe(g *Game) {
 
 		go func() {
 			defer func() {
+				if g.Ws[conn].padKeys != nil {
+					g.freePads = append(g.freePads, g.Ws[conn].padKeys...)
+					fmt.Println(g.freePads)
+				}
+
 				conn.Close()
 				delete(g.Ws, conn)
 			}()
@@ -85,12 +110,14 @@ func ListenAndServe(g *Game) {
 
 				userAction := &UserAction{}
 
-				if err := json.Unmarshal(msg, &userAction); err != nil {
-					//
+				if err := json.Unmarshal(msg, &userAction); err == nil {
+
+					if contains([]ebiten.Key{ebiten.KeySpace}, userAction.Key) || contains(g.Ws[conn].padKeys, userAction.Key) {
+						g.UpdateGameState(*userAction)
+					}
+
 				}
-				if err == nil {
-					g.UpdateGameState(*userAction)
-				}
+
 			}
 		}()
 	})

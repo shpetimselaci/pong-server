@@ -15,9 +15,15 @@ type Game struct {
 	Level    int
 	MaxScore int
 	Ws       Connections
+	freePads []ebiten.Key
 }
 
-type Connections = map[net.Conn]*net.Conn
+type PlayerConnection struct {
+	Connection *net.Conn
+	padKeys    []ebiten.Key
+}
+
+type Connections = map[net.Conn]PlayerConnection
 
 type KeyAction int
 
@@ -88,6 +94,7 @@ func (g *Game) init(player1Name string, player2Name string) {
 		YVelocity: initBallVelocity,
 	}
 	g.Level = 0
+	g.freePads = []ebiten.Key{ebiten.KeyW, ebiten.KeyS, ebiten.KeyUp, ebiten.KeyDown}
 }
 
 func (g *Game) reset(state GameState) {
