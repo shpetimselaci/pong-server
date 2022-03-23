@@ -19,6 +19,11 @@ type StateResponse struct {
 	MaxScore int
 }
 
+type CloseResponse struct {
+	Placeholder string
+	TryAgain    bool
+}
+
 func sendGameState(g *Game) error {
 
 	out, err := json.Marshal(StateResponse{
@@ -47,10 +52,17 @@ func ListenAndServe(g *Game) {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		r.Header.Set("Access-Control-Allow-Origin", "*")
+		fmt.Println(len(g.Ws))
 
-		fmt.Println("client", r.Host, r.Method, r.URL.Host)
+		fmt.Println("client", r.Host, r.Method, r.URL.Host, r.RemoteAddr)
 		conn, _, _, err := ws.DefaultHTTPUpgrader.Upgrade(r, w)
+		if len(g.Ws) == 2 {
+			out, _ := json.Marshal(CloseResponse{Placeholder: "Two players already connected!", TryAgain: true})
 
+			wsutil.WriteServerText(conn, out)
+			conn.Close()
+			return
+		}
 		g.Ws[conn] = &conn
 		if err != nil {
 			// handle error
@@ -77,7 +89,6 @@ func ListenAndServe(g *Game) {
 					//
 				}
 				if err == nil {
-					fmt.Println(userAction.Action, userAction.Key)
 					g.UpdateGameState(*userAction)
 				}
 			}
