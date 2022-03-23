@@ -98,6 +98,8 @@ func (g *Game) reset(state GameState) {
 	if state == StartState {
 		g.Player1.Score = 0
 		g.Player2.Score = 0
+		g.Player1.Speed = initPaddleSpeed
+		g.Player2.Speed = initPaddleSpeed
 	}
 	g.Player1.Position = Position{
 		X: InitPaddleShift, Y: GetCenter().Y}
