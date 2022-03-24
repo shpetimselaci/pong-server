@@ -121,7 +121,7 @@ func ListenAndServe(g *Game) {
 			}
 		}()
 	})
-	err := http.ListenAndServe("0.0.0.0:5000", nil)
+	err := http.ListenAndServe("0.0.0.0:8000", nil)
 
 	if err != nil {
 		fmt.Println("Could not start server", err)
