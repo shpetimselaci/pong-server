@@ -1,0 +1,7 @@
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '--tag=gcr.io/$PROJECT_ID/pong-server', '.']
+- name: 'gcr.io/cloud-builders/gcloud'
+  args: ['app', 'deploy', "./app.yaml"]
+timeout: '1600s'
+images: ['gcr.io/$PROJECT_ID/pong-server']
