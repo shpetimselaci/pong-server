@@ -1,20 +1,25 @@
 steps:
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', '$_GCR_HOSTNAME/$PROJECT_ID/$REPO_NAME/$COMMIT_SHA', '.']
-- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
-  args:
-    - run
-    - services
-    - update
-    - $_SERVICE_NAME
-    - '--platform=flex'
-    - '--image=$_GCR_HOSTNAME/$PROJECT_ID/$REPO_NAME/$COMMIT_SHA'
-    - >-
-      --labels=managed-by=gcp-cloud-build-deploy-cloud-run,commit-sha=$COMMIT_SHA,gcb-build-id=$BUILD_ID,gcb-trigger-id=$_TRIGGER_ID,$_LABELS
-    - '--region=$_DEPLOY_REGION'
-    - '--quiet'
-  id: Deploy
-  entrypoint: gcloud
+  args: ['build', '-t', 'us.gcr.io/$PROJECT_ID/$REPO_NAME/$COMMIT_SHA', '.']
+- name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - 'us.gcr.io/$PROJECT_ID/$REPO_NAME/$COMMIT_SHA'
+    id: Push
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
+    args:
+      - run
+      - services
+      - update
+      - $_SERVICE_NAME
+      - '--platform=managed'
+      - '--image=us.gcr.io/$PROJECT_ID/$REPO_NAME/$COMMIT_SHA'
+      - >-
+        --labels=managed-by=gcp-cloud-build-deploy-cloud-run,commit-sha=$COMMIT_SHA,gcb-build-id=$BUILD_ID,gcb-trigger-id=$_TRIGGER_ID,$_LABELS
+      - '--region=$_DEPLOY_REGION'
+      - '--quiet'
+    id: Deploy
+    entrypoint: gcloud
 timeout: '1600s'
 images:
-- '$_GCR_HOSTNAME/$PROJECT_ID/$REPO_NAME/$COMMIT_SHA'
+- 'us.gcr.io/$PROJECT_ID/$REPO_NAME/$COMMIT_SHA'
