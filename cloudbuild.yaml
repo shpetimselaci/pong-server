@@ -1,8 +1,8 @@
 steps:
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', '$_GCR_HOSTNAME/$PROJECT_ID/$_SERVICE/v1', '.']
+  args: ['build', '-t', '$_GCR_HOSTNAME/$PROJECT_ID/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA', '.']
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['push', 'gcr.io/$PROJECT_ID/$_SERVICE/v1']
+  args: ['push', '$_GCR_HOSTNAME/$PROJECT_ID/$_SERVICE/v1']
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
   args:
     - run
@@ -10,15 +10,13 @@ steps:
     - update
     - $_SERVICE_NAME
     - '--platform=flex'
-    - '--image=$_GCR_HOSTNAME/$PROJECT_ID/$_SERVICE/v1'
+    - '--image=$_GCR_HOSTNAME/$PROJECT_ID/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA'
     - >-
       --labels=managed-by=gcp-cloud-build-deploy-cloud-run,commit-sha=$COMMIT_SHA,gcb-build-id=$BUILD_ID,gcb-trigger-id=$_TRIGGER_ID,$_LABELS
     - '--region=$_DEPLOY_REGION'
     - '--quiet'
   id: Deploy
   entrypoint: gcloud
-- name: 'gcr.io/cloud-builders/gcloud'
-  args: ['app', 'deploy', "--image-url=gcr.io/$PROJECT_ID/$_SERVICE/v1", "--verbosity=debug"]
 timeout: '1600s'
 images:
-- '$_GCR_HOSTNAME/$PROJECT_ID/$_SERVICE/v1'
+- '$_GCR_HOSTNAME/$PROJECT_ID/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA'
