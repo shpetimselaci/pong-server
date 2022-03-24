@@ -1,7 +1,6 @@
 steps:
 - name: 'gcr.io/cloud-builders/docker'
-  args: [ 'build', '-t', 'gcr.io/$PROJECT_ID/pong-server:latest', '.' ]
-  dir: './'
+  args: [ 'build', '.' ]
 - name: 'gcr.io/cloud-builders/gcloud'
   args: ['app', 'deploy', "--image-url=us.gcr.io/$PROJECT_ID/appengine/:latest", "--verbosity=debug"]
 timeout: '1600s'
