@@ -1,13 +1,13 @@
 steps:
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'us.gcr.io/$PROJECT_ID/$REPO_NAME/$COMMIT_SHA', '.']
+  args: ['build', '-t', 'gcr.io/$PROJECT_ID/$REPO_NAME/$COMMIT_SHA', '.']
 - name: gcr.io/cloud-builders/docker
-  args: ['push', 'us.gcr.io/$PROJECT_ID/$REPO_NAME/$COMMIT_SHA']
+  args: ['push', 'gcr.io/$PROJECT_ID/$REPO_NAME/$COMMIT_SHA']
   id: Push
 - name: 'gcr.io/cloud-builders/gcloud'
-  args: [ 'app', 'deploy', '--image-url=us.gcr.io/$PROJECT_ID/$REPO_NAME/$COMMIT_SHA', '--verbosity=debug']
+  args: [ 'app', 'deploy', '--image-url=gcr.io/$PROJECT_ID/$REPO_NAME/$COMMIT_SHA', '--verbosity=debug']
   id: Deploy
   entrypoint: gcloud
 timeout: '1600s'
 images:
-- 'us.gcr.io/$PROJECT_ID/$REPO_NAME/$COMMIT_SHA'
+- 'gcr.io/$PROJECT_ID/$REPO_NAME/$COMMIT_SHA'
