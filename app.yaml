@@ -3,9 +3,3 @@ env: flex
 automatic_scaling:
   min_num_instances: 1
   max_num_instances: 2
-network:
-  forwarded_ports:
-    - '8080'
-    - '8080:8080'
-    - '8080/tcp'
-    - '8080:8080/udp'
