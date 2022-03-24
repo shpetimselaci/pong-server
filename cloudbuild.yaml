@@ -4,7 +4,7 @@ steps:
 - name: gcr.io/cloud-builders/docker
   args: ['push', 'us.gcr.io/$PROJECT_ID/$REPO_NAME/$COMMIT_SHA']
   id: Push
-- name: 'gcr.io/google.com/cloudsdktool/gcloud'
+- name: 'gcr.io/cloud-builders/gcloud'
   args: [ 'app', 'deploy', '--image-url=us.gcr.io/$PROJECT_ID/$REPO_NAME/$COMMIT_SHA', '--verbosity=debug']
   id: Deploy
   entrypoint: gcloud
