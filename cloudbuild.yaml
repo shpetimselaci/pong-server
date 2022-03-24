@@ -4,8 +4,8 @@ steps:
 - name: gcr.io/cloud-builders/docker
   args: ['push', 'us.gcr.io/$PROJECT_ID/$REPO_NAME/$COMMIT_SHA']
   id: Push
-- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
-  args: [ 'run', 'services', 'update', '$REPO_NAME', '--platform=managed', '--image=us.gcr.io/$PROJECT_ID/$REPO_NAME/$COMMIT_SHA', '--labels=managed-by=gcp-cloud-build-deploy-cloud-run,commit-sha=$COMMIT_SHA,gcb-build-id=$BUILD_ID,gcb-trigger-id=$_TRIGGER_ID,$_LABELS', '--region=us', '--quiet']
+- name: 'gcr.io/google.com/cloudsdktool/gcloud'
+  args: [ 'app', 'deploy', '--image-url=us.gcr.io/$PROJECT_ID/$REPO_NAME/$COMMIT_SHA', '--verbosity=debug']
   id: Deploy
   entrypoint: gcloud
 timeout: '1600s'
