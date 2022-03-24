@@ -5,7 +5,7 @@ automatic_scaling:
   max_num_instances: 2
 network:
   forwarded_ports:
-    - 5000
-    - 5000:5000
-    - 5000/tcp
-    - 5000:5000/udp
+    - '5000'
+    - '5000:5000'
+    - '5000/tcp'
+    - '5000:5000/udp'
