@@ -2,10 +2,10 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '-t', 'us.gcr.io/$PROJECT_ID/$REPO_NAME/$COMMIT_SHA', '.']
 - name: gcr.io/cloud-builders/docker
-    args:
-      - push
-      - 'us.gcr.io/$PROJECT_ID/$REPO_NAME/$COMMIT_SHA'
-    id: Push
+  args:
+    - push
+    - 'us.gcr.io/$PROJECT_ID/$REPO_NAME/$COMMIT_SHA'
+  id: Push
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
   args:
     - run
