@@ -1,7 +1,24 @@
 steps:
 - name: 'gcr.io/cloud-builders/docker'
-  args: [ 'build', '-t', 'us.gcr.io/$PROJECT_ID/pong-server/default:latest', '.']
+  args: ['build', '-t', '$_GCR_HOSTNAME/$PROJECT_ID/$_SERVICE/v1', '.']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'gcr.io/$PROJECT_ID/$_SERVICE/v1']
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
+  args:
+    - run
+    - services
+    - update
+    - $_SERVICE_NAME
+    - '--platform=flex'
+    - '--image=$_GCR_HOSTNAME/$PROJECT_ID/$_SERVICE/v1'
+    - >-
+      --labels=managed-by=gcp-cloud-build-deploy-cloud-run,commit-sha=$COMMIT_SHA,gcb-build-id=$BUILD_ID,gcb-trigger-id=$_TRIGGER_ID,$_LABELS
+    - '--region=$_DEPLOY_REGION'
+    - '--quiet'
+  id: Deploy
+  entrypoint: gcloud
 - name: 'gcr.io/cloud-builders/gcloud'
-  args: ['app', 'deploy', "--image-url=us.gcr.io/$PROJECT_ID/pong-server/default:latest", "--verbosity=debug"]
+  args: ['app', 'deploy', "--image-url=gcr.io/$PROJECT_ID/$_SERVICE/v1", "--verbosity=debug"]
 timeout: '1600s'
-images: [us.gcr.io/$PROJECT_ID/pong-server/default:latest]
+images:
+- '$_GCR_HOSTNAME/$PROJECT_ID/$_SERVICE/v1'
