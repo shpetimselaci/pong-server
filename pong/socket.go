@@ -121,8 +121,11 @@ func ListenAndServe(g *Game) {
 			}
 		}()
 	})
+	fmt.Println("runnning")
+
 	err := http.ListenAndServe("0.0.0.0:8080", nil)
 
+	fmt.Println("Listening on port 8080")
 	if err != nil {
 		fmt.Println("Could not start server", err)
 		panic(err)

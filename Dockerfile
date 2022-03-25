@@ -12,6 +12,5 @@ RUN go build -v -o /usr/local/bin/app ./main.go
 EXPOSE 8080
 # ENV DISPLAY :99
 
-CMD ["xvfb-run", "-a", "app"]
-
+CMD ["sh", "./run.sh"]
 
