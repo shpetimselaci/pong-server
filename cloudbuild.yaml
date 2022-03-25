@@ -5,7 +5,7 @@ steps:
   args: ['push', 'gcr.io/$PROJECT_ID/$REPO_NAME/$COMMIT_SHA']
   id: Push
 - name: 'gcr.io/cloud-builders/gcloud'
-  args: [ 'app', 'deploy', '--image-url=gcr.io/$PROJECT_ID/$REPO_NAME/$COMMIT_SHA', '--verbosity=debug']
+  args: [ 'app', 'deploy', '--image-url=gcr.io/$PROJECT_ID/$REPO_NAME/$COMMIT_SHA']
   id: Deploy
   entrypoint: gcloud
 timeout: '1600s'
